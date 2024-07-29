@@ -1,8 +1,11 @@
 "use client";
 import { useStore } from "@/src/store";
+import { toast } from "react-toastify";
 import ProductDetails from "./ProductDetails";
 import { useMemo } from "react";
 import { formatCurrency } from "@/src/lib/utils";
+import { createOrder } from "@/actions/create-order-action";
+import { OrderSchema } from "@/src/schena";
 
 export default function OrderSumary() {
   const order = useStore((state) => state.order);
@@ -10,7 +13,20 @@ export default function OrderSumary() {
     () => order.reduce((total, item) => total + item.quantity * item.price, 0),
     [order]
   );
+  const handleCreateOrder = (formData: FormData) => {
+    const data = {
+      name: formData.get("name"),
+    };
+    const result = OrderSchema.safeParse(data);
+    if (!result.success) {
+      result.error.issues.forEach((issue) => {
+        toast.error(issue.message);
+      });
+    }
+    return;
 
+    createOrder();
+  };
   return (
     <aside className="lg:h-screen lg:overflow-scroll md:w-64 lg:w-96 p-5">
       <h1 className="text-4xl text-center font-black">Mi pedido</h1>
@@ -25,6 +41,19 @@ export default function OrderSumary() {
             Total a pagar: {""}
             <span className="font-bold">{formatCurrency(total)}</span>
           </p>
+          <form action={handleCreateOrder} className="w-full mt-10 space-y-5">
+            <input
+              type="text"
+              placeholder="Nombre del cliente"
+              className=" bg-white border border-gray-100 p-2 w-full"
+              name="name"
+            />
+            <input
+              type="submit"
+              className=" py-2 rounded uppercase text-white bg-black w-full text-center
+                cursor-pointer font-bold"
+            />
+          </form>
         </div>
       )}
     </aside>
