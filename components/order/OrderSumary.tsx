@@ -6,26 +6,37 @@ import { useMemo } from "react";
 import { formatCurrency } from "@/src/lib/utils";
 import { createOrder } from "@/actions/create-order-action";
 import { OrderSchema } from "@/src/schena";
+import { error } from "console";
 
 export default function OrderSumary() {
   const order = useStore((state) => state.order);
+  const clearOrder = useStore((state) => state.clearOrder);
   const total = useMemo(
     () => order.reduce((total, item) => total + item.quantity * item.price, 0),
     [order]
   );
-  const handleCreateOrder = (formData: FormData) => {
+  const handleCreateOrder = async (formData: FormData) => {
     const data = {
       name: formData.get("name"),
+      total,
+      order,
     };
     const result = OrderSchema.safeParse(data);
     if (!result.success) {
       result.error.issues.forEach((issue) => {
         toast.error(issue.message);
       });
+      return;
     }
-    return;
 
-    createOrder();
+    const response = await createOrder(data);
+    if (response?.errors) {
+      response.errors.forEach((issue) => {
+        toast.error(issue.message);
+      });
+    }
+    toast.success("Pedido enviado.");
+    clearOrder();
   };
   return (
     <aside className="lg:h-screen lg:overflow-scroll md:w-64 lg:w-96 p-5">
