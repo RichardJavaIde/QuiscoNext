@@ -1,4 +1,9 @@
+import AddProductForm from "@/components/product/AddProductForm";
 import React from "react";
 export default function ProductsNewPage() {
-  return <h2>Hola ProductsNew.tsx</h2>;
+  return (
+    <>
+      <AddProductForm />
+    </>
+  );
 }
