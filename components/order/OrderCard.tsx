@@ -3,7 +3,7 @@ import { formatCurrency } from "@/src/lib/utils";
 import { OrderWithProducts } from "@/src/types";
 
 type OrderCardProps = {
-  order: OrderWithProducts;
+  order: OrderWithProducts[];
 };
 
 export default function OrderCard({ order }: OrderCardProps) {
